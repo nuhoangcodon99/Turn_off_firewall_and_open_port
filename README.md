@@ -1,1 +1,1 @@
-# Turn_off_firewall_and_open_port
+Download file zip of gitclone and Run as administrator
