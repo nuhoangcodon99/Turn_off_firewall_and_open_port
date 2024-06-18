@@ -1,4 +1,16 @@
-New-NetFirewallRule -DisplayName "Open Port 80" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
-New-NetFirewallRule -DisplayName "Open Port 443" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
-New-NetFirewallRule -DisplayName "Open Port 3306" -Direction Inbound -Protocol TCP -LocalPort 3306 -Action Allow
-New-NetFirewallRule -DisplayName "Open Port 14445" -Direction Inbound -Protocol TCP -LocalPort 14445 -Action Allow
+# Define a function to open ports
+function Open-Ports {
+    param (
+        [int[]]$Ports
+    )
+
+    foreach ($port in $Ports) {
+        # Mở cổng vào (Inbound)
+        New-NetFirewallRule -DisplayName "Open Port $port Inbound" -Direction Inbound -Protocol TCP -LocalPort $port -Action Allow
+        # Mở cổng ra (Outbound)
+        New-NetFirewallRule -DisplayName "Open Port $port Outbound" -Direction Outbound -Protocol TCP -LocalPort $port -Action Allow
+    }
+}
+
+# Gọi hàm Open-Ports với các cổng cần mở
+Open-Ports -Ports @(80, 443, 3306, 14445)
