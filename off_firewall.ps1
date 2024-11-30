@@ -1,20 +1,20 @@
-# Kiểm tra xem script có đang chạy với quyền quản trị hay không
+# Check if the script is running with administrative privileges
 If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    # Nếu không có quyền quản trị, yêu cầu quyền quản trị
+    # Request administrative privileges if not already granted
     $arguments = "& '" + $myinvocation.mycommand.definition + "'"
     Start-Process powershell -Verb runAs -ArgumentList $arguments
     Exit
 }
 
-# Hiển thị thông báo bắt đầu tắt Firewall
-Write-Host "Tắt Windows Defender Firewall..."
+# Display a message indicating the start of the Firewall disabling process
+Write-Host "Disabling Windows Defender Firewall..."
 
-# Tắt Windows Defender Firewall cho tất cả các profile (Domain, Private, Public)
+# Disable Windows Defender Firewall for all profiles (Domain, Private, Public)
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# Hiển thị thông báo hoàn thành
-Write-Host "Windows Defender Firewall đã được tắt."
+# Display a completion message
+Write-Host "Windows Defender Firewall has been successfully disabled."
 
-# Dừng lại và chờ người dùng nhấn phím để kết thúc
-Write-Host "Nhấn phím bất kỳ để thoát..."
+# Pause and wait for the user to press a key before exiting
+Write-Host "Press any key to exit..."
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
