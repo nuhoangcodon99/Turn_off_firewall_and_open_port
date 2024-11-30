@@ -1,9 +1,9 @@
 @echo off
-:: Tắt hiển thị các lệnh trong file batch
-echo Tắt Windows Defender Firewall...
+:: Disable command display in the batch file
+echo Turning off Windows Defender Firewall...
 
-:: Kiểm tra và yêu cầu quyền quản trị
-:: Tạo biến xác định nếu script đã có quyền quản trị
+:: Check and request administrative privileges
+:: Create a variable to determine if the script has admin rights
 :checkPrivileges
 NET FILE 1>NUL 2>NUL
 if '%errorlevel%' == '0' ( goto gotPrivileges ) else ( goto getPrivileges )
@@ -16,15 +16,16 @@ ECHO UAC.ShellExecute "cmd.exe", "/c %~s0 ELEV", "", "runas", 1 >> "%temp%\getad
 exit /B
 
 :gotPrivileges
-:: Xóa file tạm chứa script để lấy quyền quản trị
+:: Delete the temporary script for admin privileges
 if exist "%temp%\getadmin.vbs" (del "%temp%\getadmin.vbs")
 
-:: Lệnh tắt Windows Defender Firewall cho cả domain, private và public profile
+:: Disable Windows Defender Firewall for all profiles (domain, private, and public)
+echo Disabling Windows Defender Firewall for all profiles...
 netsh advfirewall set allprofiles state off
 
-:: Hiển thị thông báo hoàn thành
-echo Windows Defender Firewall đã được tắt.
+:: Display a completion message
+echo Windows Defender Firewall has been turned off.
 
-:: Dừng lại và chờ người dùng nhấn phím để kết thúc
+:: Pause and wait for user input before exiting
 pause
 exit
