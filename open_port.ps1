@@ -1,33 +1,31 @@
-# Kiểm tra xem script có đang chạy với quyền quản trị hay không
+# Check if the script is running with administrative privileges
 If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    # Nếu không có quyền quản trị, yêu cầu quyền quản trị
+    # If not, request administrative privileges
     $arguments = "& '" + $myinvocation.mycommand.definition + "'"
     Start-Process powershell -Verb runAs -ArgumentList $arguments
     Exit
 }
 
-# Hiển thị thông báo bắt đầu mở các port
-Write-Host "Mở các port cần thiết trên Windows Firewall..."
+# Display a message indicating the start of port configuration
+Write-Host "Opening required ports in Windows Firewall..." -ForegroundColor Green
 
-# Mở port 80
-Write-Host "Mở port 80..."
-New-NetFirewallRule -DisplayName "Open Port 80" -Direction Inbound -LocalPort 80 -Protocol TCP -Action Allow
+# List of ports to open
+$ports = @(80, 443, 3306, 14445)
 
-# Mở port 443
-Write-Host "Mở port 443..."
-New-NetFirewallRule -DisplayName "Open Port 443" -Direction Inbound -LocalPort 443 -Protocol TCP -Action Allow
+# Loop through each port and open it
+foreach ($port in $ports) {
+    Write-Host "Opening port $port..."
+    Try {
+        New-NetFirewallRule -DisplayName "Open Port $port" -Direction Inbound -LocalPort $port -Protocol TCP -Action Allow -ErrorAction Stop
+        Write-Host "Port $port opened successfully." -ForegroundColor Green
+    } Catch {
+        Write-Host "Failed to open port $port: $_" -ForegroundColor Red
+    }
+}
 
-# Mở port 3306
-Write-Host "Mở port 3306..."
-New-NetFirewallRule -DisplayName "Open Port 3306" -Direction Inbound -LocalPort 3306 -Protocol TCP -Action Allow
+# Display completion message
+Write-Host "All required ports have been opened." -ForegroundColor Green
 
-# Mở port 14445
-Write-Host "Mở port 14445..."
-New-NetFirewallRule -DisplayName "Open Port 14445" -Direction Inbound -LocalPort 14445 -Protocol TCP -Action Allow
-
-# Hiển thị thông báo hoàn thành
-Write-Host "Đã mở tất cả các port."
-
-# Dừng lại và chờ người dùng nhấn phím để kết thúc
-Write-Host "Nhấn phím bất kỳ để thoát..."
+# Pause to wait for user input before exiting
+Write-Host "Press any key to exit..."
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
